@@ -12,17 +12,28 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tr_penjualan', function (Blueprint $table) {
-            $table->string('id_penjualan', 255)->primary();
+            $table->uuid('id_penjualan')->primary();
+            
             $table->string('id_order', 255);
-            $table->string('id_admin', 50); // yang melayani pesanan
-            $table->dateTime('tanggal_penjualan');
+            $table->string('id_admin', 50); // admin yang melayani
+            
+            $table->dateTime('tanggal_penjualan')->default(now());
             $table->decimal('total_penjualan', 12, 2);
+            
             $table->timestamps();
 
-            $table->foreign('id_order')->references('id_order')->on('pesanan')->onDelete('cascade');
-            $table->foreign('id_admin')->references('id_user')->on('users')->onDelete('restrict');
-        });
+            // FK ke pesanan
+            $table->foreign('id_order')
+                  ->references('id_order')
+                  ->on('pesanan')
+                  ->onDelete('cascade');
 
+            // FK ke admin (users)
+            $table->foreign('id_admin')
+                  ->references('id_user')
+                  ->on('users')
+                  ->onDelete('restrict');
+        });
     }
 
     /**

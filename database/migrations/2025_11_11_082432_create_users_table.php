@@ -11,14 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('users', function (Blueprint $table) {
-        $table->string('id_user', 50)->primary();
-        $table->string('name');
-        $table->string('email')->unique();
-        $table->string('password');
-        $table->enum('role', ['admin', 'customer']);
-        $table->timestamps();
-    });
+        Schema::create('users', function (Blueprint $table) {
+            // UUID sebagai PRIMARY KEY
+            $table->uuid('id_user')->primary();
+
+            $table->string('name', 100);
+            $table->string('email', 100)->unique();
+
+            // Panjang 255 untuk hash password
+            $table->string('password', 255);
+
+            $table->enum('role', ['admin', 'customer'])->index();
+
+            $table->rememberToken(); // penting untuk auth
+            $table->timestamps();
+        });
     }
 
     /**

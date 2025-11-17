@@ -12,16 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pesanan', function (Blueprint $table) {
-            $table->string('id_order', 255)->primary();
-            $table->string('id_bunga', 255);
+            $table->uuid('id_order')->primary();   // UUID
             $table->string('id_user', 50);
+
             $table->dateTime('tanggal_pemesanan');
-            $table->decimal('total', 12, 2);
-            $table->enum('status', ['pending', 'processing', 'done', 'cancel'])->default('pending');
+            $table->decimal('total', 12, 2)->default(0);
+            $table->enum('status', ['pending', 'processing', 'done', 'cancel'])
+                  ->default('pending');
+
             $table->timestamps();
 
-            $table->foreign('id_bunga')->references('id_bunga')->on('bunga')->onDelete('restrict');
-            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('restrict');
+            $table->foreign('id_user')
+                  ->references('id_user')
+                  ->on('users')
+                  ->onDelete('restrict');
         });
     }
 
