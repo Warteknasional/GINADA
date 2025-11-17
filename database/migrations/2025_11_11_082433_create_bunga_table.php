@@ -11,15 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('bunga', function (Blueprint $table) {
-        $table->string('id_bunga', 255)->primary();
-        $table->string('nama', 150);
-        $table->string('kategori', 150);
-        $table->integer('stok');
-        $table->decimal('harga', 12, 2);
-        $table->timestamps();
-    });
+        Schema::create('bunga', function (Blueprint $table) {
 
+            // UUID sebagai primary key
+            $table->uuid('id_bunga')->primary();
+
+            $table->string('nama', 150);
+
+            // pakai enum biar gak bebas input kategori
+            $table->enum('kategori', [
+                'fresh_flower',
+                'artificial_flower',
+                'bouquet',
+                'tanaman_hias'
+            ]);
+
+            $table->integer('stok')->default(0);
+            $table->decimal('harga', 12, 2);
+
+            $table->timestamps();
+            $table->softDeletes(); // biar bisa delete tanpa hilang dari database
+        });
     }
 
     /**

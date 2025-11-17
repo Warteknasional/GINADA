@@ -12,13 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detail_pemesanan', function (Blueprint $table) {
-            $table->string('id', 255)->primary();
-            $table->string('id_order', 255);
-            $table->integer('jumlah');
+            $table->uuid('id_detail')->primary();
+            $table->uuid('id_order');
+            $table->uuid('id_bunga');
+
+            $table->integer('jumlah'); // qty
+            $table->decimal('harga_satuan', 12, 2);
             $table->decimal('subtotal', 12, 2);
+
             $table->timestamps();
 
-            $table->foreign('id_order')->references('id_order')->on('pesanan')->onDelete('restrict');
+            $table->foreign('id_order')
+                ->references('id_order')
+                ->on('pesanan')
+                ->onDelete('cascade');
+
+            $table->foreign('id_bunga')
+                ->references('id_bunga')
+                ->on('bunga')
+                ->onDelete('restrict');
         });
     }
 
