@@ -9,19 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pembayaran', function (Blueprint $table) {
-            $table->string('id_pembayaran', 255)->primary();
-
-            $table->string('id_order', 255);
-            $table->foreign('id_order')
-                ->references('id_order')
-                ->on('pesanan')
-                ->onDelete('cascade');
-
+            $table->id();
+            $table->foreignId('pesanan_id')->constrained('pesanan')->onDelete('cascade');
+            $table->integer('jumlah_bayar');
             $table->enum('metode', ['transfer', 'cod', 'qris']);
-            $table->enum('status', ['pending', 'dibayar', 'gagal'])->default('pending');
-            $table->string('bukti_transfer')->nullable();
-            $table->timestamp('tanggal_bayar')->nullable();
-
+            $table->enum('status', ['pending', 'valid', 'invalid'])->default('pending');
+            $table->string('bukti_bayar')->nullable(); // foto
             $table->timestamps();
         });
     }
