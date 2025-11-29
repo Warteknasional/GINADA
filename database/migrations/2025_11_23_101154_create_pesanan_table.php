@@ -27,7 +27,13 @@ return new class extends Migration
             $table->integer('ongkir')->default(0);
 
             $table->enum('status', [
-                'pending', 'diproses', 'siap', 'dikirim', 'selesai', 'dibatalkan'
+                'pending', 
+                'dibayar', // <--- TAMBAHKAN INI
+                'diproses', 
+                'siap', 
+                'dikirim', 
+                'selesai', 
+                'dibatalkan'
             ])->default('pending');
 
             $table->text('catatan')->nullable();

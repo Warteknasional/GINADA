@@ -9,9 +9,11 @@ class Pesanan extends Model
 {
     use HasFactory;
 
+    // WAJIB ADA: Karena nama tabel di migrasi adalah 'pesanan' (bukan pesanans)
+    protected $table = 'pesanan';
+
     protected $fillable = [
         'user_id',
-        'area_id',
         'kode_pesanan',
         'total_harga',
         'ongkir',
