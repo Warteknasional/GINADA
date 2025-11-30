@@ -22,9 +22,10 @@ class AreaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_area' => 'required|string|unique:area,nama_area',
-            'ongkir' => 'required|integer|min:0',
-            'catatan' => 'nullable|string'
+            'nama_area' => 'required|string',
+            'ongkir'    => 'required|integer',
+            'estimasi'  => 'required|string', // <--- Wajib diisi
+            'catatan'   => 'nullable|string'
         ]);
 
         Area::create($request->all());
@@ -39,9 +40,10 @@ class AreaController extends Controller
     public function update(Request $request, Area $area)
     {
         $request->validate([
-            'nama_area' => 'required|string|unique:area,nama_area,'.$area->id,
-            'ongkir' => 'required|integer|min:0',
-            'catatan' => 'nullable|string'
+            'nama_area' => 'required|string',
+            'ongkir'    => 'required|integer',
+            'estimasi'  => 'required|string', // <--- Wajib diisi
+            'catatan'   => 'nullable|string'
         ]);
 
         $area->update($request->all());

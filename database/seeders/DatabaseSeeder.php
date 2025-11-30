@@ -20,6 +20,14 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'), // password: password
         ]);
 
+        // AKUN ADMIN (Untuk Login ke Admin Panel)
+        User::create([
+            'name' => 'Admin Ginada',
+            'email' => 'admin@gmail.com',
+            'password' => bcrypt('password'), // passwordnya: password
+            'role' => 'admin', // <--- INI KUNCINYA
+        ]);
+
         // 2. Buat Kategori Utama (Flowers, Leaf, Other)
         // Kita simpan ID kategori Flowers ke variabel untuk dipakai produk
         $catFlowers = Category::create(['name' => 'Flowers', 'slug' => 'flowers']);

@@ -14,6 +14,7 @@ class Area extends Model
     protected $fillable = [
         'nama_area',
         'ongkir',
+        'estimasi', // <--- TAMBAHKAN INI
         'catatan',
     ];
 

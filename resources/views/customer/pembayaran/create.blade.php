@@ -73,35 +73,44 @@
                         <div class="absolute top-0 left-0 w-1 h-full bg-olive"></div>
                         <h3 class="font-heading text-xl text-olive font-bold mb-6 flex items-center gap-3">
                             <span class="bg-olive text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-md">1</span>
-                            Tujuan Pengiriman
+                            Pengiriman
                         </h3>
                         
                         <div class="mb-5">
-                            <label class="block text-xs font-bold text-taupe uppercase tracking-wider mb-2">Kecamatan / Kota</label>
-                            <div class="relative">
-                                <select name="city_id" id="city_select" required 
-                                    class="w-full bg-surface border border-sand px-4 py-3 text-olive font-medium focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition appearance-none cursor-pointer">
-                                    <option value="" data-ongkir="0">-- Pilih Lokasi Anda --</option>
-                                    
-                                    @foreach($cities as $city)
-                                        <option value="{{ $city->id }}" data-ongkir="{{ $city->area->ongkir }}">
-                                            {{ $city->name }} (Ongkir: Rp {{ number_format($city->area->ongkir, 0, ',', '.') }})
-                                        </option>
-                                    @endforeach
+                            <label class="block text-xs font-bold text-taupe uppercase tracking-wider mb-2">Wilayah Tujuan</label>
+                            <select name="city_id" id="city_select" ... >
+                                <option value="" data-ongkir="0">-- Pilih Lokasi Anda --</option>
+                                @foreach($cities as $city)
+                                    <option value="{{ $city->id }}" data-ongkir="{{ $city->area->ongkir }}">
+                                        {{ $city->name }} (Ongkir: Rp {{ number_format($city->area->ongkir, 0, ',', '.') }} - {{ $city->area->estimasi }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-5">
+                            <div>
+                                <label class="block text-xs font-bold text-taupe uppercase tracking-wider mb-2">Tanggal Kirim</label>
+                                <input type="date" name="tanggal_pengiriman" required min="{{ date('Y-m-d') }}"
+                                    class="w-full bg-surface border border-sand px-4 py-3 text-olive focus:outline-none focus:border-coral transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-taupe uppercase tracking-wider mb-2">Waktu Kirim</label>
+                                <select name="waktu_pengiriman" required class="w-full bg-surface border border-sand px-4 py-3 text-olive focus:outline-none focus:border-coral transition">
+                                    <option value="Pagi (08.00 - 12.00)">Pagi (08.00 - 12.00)</option>
+                                    <option value="Siang (12.00 - 15.00)">Siang (12.00 - 15.00)</option>
+                                    <option value="Sore (15.00 - 18.00)">Sore (15.00 - 18.00)</option>
                                 </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-olive">
-                                    <i class="fas fa-chevron-down text-xs"></i>
-                                </div>
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-taupe uppercase tracking-wider mb-2">Detail Alamat Lengkap</label>
-                            <textarea name="alamat_detail" rows="3" required placeholder="Nama Jalan, Nomor Rumah, RT/RW, Patokan (Pagar Hitam/Depan Masjid)" 
-                                class="w-full bg-surface border border-sand px-4 py-3 text-olive focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition placeholder-taupe/50"></textarea>
+                            <label class="block text-xs font-bold text-taupe uppercase tracking-wider mb-2">Alamat Lengkap</label>
+                            <textarea name="alamat_detail" rows="2" required placeholder="Jalan, Nomor Rumah, Patokan..." 
+                                class="w-full bg-surface border border-sand px-4 py-3 text-olive focus:outline-none focus:border-coral transition"></textarea>
                         </div>
                     </div>
-
+                    
                     <div class="bg-white p-8 border border-sand/20 shadow-sm relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-1 h-full bg-coral"></div>
                         <h3 class="font-heading text-xl text-olive font-bold mb-6 flex items-center gap-3">

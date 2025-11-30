@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
+use App\Exports\PesananExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PesananController extends Controller
 {
@@ -18,7 +21,7 @@ class PesananController extends Controller
     public function show(Pesanan $pesanan)
     {
         return view('admin.pesanan.show', [
-            'pesanan' => $pesanan->load('detail.product', 'pembayaran', 'penjadwalan')
+            'pesanan' => $pesanan->load('detail.product', 'pembayaran')
         ]);
     }
 
@@ -28,5 +31,21 @@ class PesananController extends Controller
         $pesanan->update(['status' => $request->status]);
 
         return back()->with('success', 'Status pesanan diperbarui');
+    }
+
+    public function export()
+    {
+        return Excel::download(new PesananExport, 'laporan-pesanan.xlsx');
+    }
+    public function cetakPDF()
+    {
+        // Ambil data pesanan yang sudah selesai/dibayar (supaya laporannya valid)
+        $pesanan = \App\Models\Pesanan::with('user')->whereIn('status', ['dibayar', 'diproses', 'dikirim', 'selesai'])->get();
+
+        // Load View khusus PDF
+        $pdf = Pdf::loadView('admin.laporan.pdf', compact('pesanan'));
+
+        // Download file PDF
+        return $pdf->download('laporan-penjualan-ginada.pdf');
     }
 }

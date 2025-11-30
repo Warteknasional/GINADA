@@ -22,16 +22,21 @@ class PembayaranController extends Controller
     {
         // 1. VALIDASI (Sesuaikan nama dengan form di create.blade.php)
         $request->validate([
-            'city_id'       => 'required|exists:cities,id', // Tangkap ID Kota
-            'alamat_detail' => 'required|string|min:5',     // Tangkap Alamat Detail
-            'bukti'         => 'required|image|max:10240'   // Maks 10MB
+            'city_id'            => 'required|exists:cities,id',
+            'alamat_detail'      => 'required|string|min:5',
+            'tanggal_pengiriman' => 'required|date|after_or_equal:today', // Validasi Tanggal
+            'waktu_pengiriman'   => 'required|string',
+            'bukti'              => 'required|image|max:10240'
         ]);
 
         // 2. AMBIL DATA KOTA & AREA
         // Kita cari kota yang dipilih user, lalu ambil harga ongkir dari areanya
         $city = \App\Models\City::with('area')->findOrFail($request->city_id);
-        
-        $ongkir = $city->area->ongkir; // Ambil harga ongkir
+        $ongkir = $city->area->ongkir;
+        $alamatLengkap = $request->alamat_detail . ', ' . $city->name . ' (' . $city->area->nama_area . ')';
+        $subtotalProduk = $pesanan->detail->sum('subtotal');
+        $grandTotal = $subtotalProduk + $ongkir;
+        $path = $request->file('bukti')->store('bukti_pembayaran', 'public');
         
         // 3. GABUNGKAN ALAMAT (Untuk disimpan di database)
         // Format: "Jalan Mawar No 12, Kec. Batu (Area Dekat)"
@@ -47,10 +52,12 @@ class PembayaranController extends Controller
         // 6. UPDATE PESANAN
         // Kita simpan alamat lengkap yang sudah digabung tadi ke kolom 'alamat_kirim'
         $pesanan->update([
-            'alamat_kirim' => $alamatLengkap, 
-            'ongkir'       => $ongkir,
-            'total_harga'  => $grandTotal,
-            'status'       => 'dibayar'
+            'alamat_kirim'       => $alamatLengkap,
+            'tanggal_pengiriman' => $request->tanggal_pengiriman, // Simpan Tanggal
+            'waktu_pengiriman'   => $request->waktu_pengiriman,   // Simpan Waktu
+            'ongkir'             => $ongkir,
+            'total_harga'        => $grandTotal,
+            'status'             => 'dibayar'
         ]);
 
         // 7. BUAT DATA PEMBAYARAN

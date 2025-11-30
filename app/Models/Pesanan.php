@@ -18,8 +18,10 @@ class Pesanan extends Model
         'total_harga',
         'ongkir',
         'status',
-        'catatan',
         'alamat_kirim',
+        'tanggal_pengiriman', // <--- Tambah
+        'waktu_pengiriman',   // <--- Tambah
+        'catatan',
     ];
 
     public function user()
@@ -42,8 +44,4 @@ class Pesanan extends Model
         return $this->hasOne(Pembayaran::class);
     }
 
-    public function penjadwalan()
-    {
-        return $this->hasMany(Penjadwalan::class);
-    }
 }

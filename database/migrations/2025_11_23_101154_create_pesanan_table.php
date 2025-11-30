@@ -38,6 +38,8 @@ return new class extends Migration
 
             $table->text('catatan')->nullable();
             $table->string('alamat_kirim');
+            $table->date('tanggal_pengiriman')->nullable();
+            $table->string('waktu_pengiriman')->nullable();
             
             $table->timestamps();
         });
