@@ -4,43 +4,50 @@
 
 @section('content')
 
-{{-- LOGIKA TAMPILAN: CEK APAKAH SEDANG MEMILIH KATEGORI? --}}
+{{-- ================================================================= --}}
+{{-- 1. TAMPILAN DETAIL KATEGORI (JIKA USER MEMILIH KATEGORI)          --}}
+{{-- ================================================================= --}}
 @if(request('category'))
     
-    {{-- ================================================================= --}}
-    {{-- TAMPILAN KHUSUS KATEGORI (SEPERTI REFERENSI GAMBAR KE-2)          --}}
-    {{-- ================================================================= --}}
-
     <div class="relative w-full h-[350px] overflow-hidden bg-olive">
         <div class="absolute inset-0 opacity-60">
-            @if(request('category') == 'flowers')
-                <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover" alt="Flowers">
-            @elseif(request('category') == 'leaf')
-                <img src="https://images.unsplash.com/photo-1470058869958-2a77ade41c02?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover" alt="Leaf">
+            @php
+                $catSlug = request('category');
+                // Cari data kategori berdasarkan slug dari koleksi $categories yang dikirim controller
+                // (Ini opsional agar banner atas juga dinamis)
+                $currentCat = $categories->where('slug', $catSlug)->first();
+            @endphp
+
+            @if($currentCat && $currentCat->image)
+                <img src="{{ asset('storage/' . $currentCat->image) }}" alt="{{ $catSlug }}" class="w-full h-full object-cover">
             @else
-                {{-- Default Image (Paper/Other) --}}
-                <img src="https://images.unsplash.com/photo-1606822363068-154cb438e886?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover" alt="Other">
+                @php
+                    $bgImage = 'https://images.unsplash.com/photo-1606822363068-154cb438e886?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80';
+                    if(stripos($catSlug, 'flower') !== false || stripos($catSlug, 'bunga') !== false) {
+                        $bgImage = 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80';
+                    } elseif(stripos($catSlug, 'leaf') !== false || stripos($catSlug, 'daun') !== false) {
+                        $bgImage = 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80';
+                    }
+                @endphp
+                <img src="{{ $bgImage }}" class="w-full h-full object-cover" alt="{{ $catSlug }}">
             @endif
         </div>
         
-        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="absolute inset-0 bg-black/20"></div>
 
         <div class="absolute inset-0 flex flex-col items-center justify-center">
             <span class="text-white/80 font-bold tracking-[0.2em] text-xs uppercase mb-2">Kategori</span>
             <h1 class="text-white font-heading text-5xl md:text-6xl font-bold tracking-[0.2em] uppercase drop-shadow-md">
-                {{ request('category') }}
+                {{ isset($currentCat) ? $currentCat->name : $catSlug }}
             </h1>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-            
-            <div class="border border-sand px-6 py-3 text-xs font-bold uppercase tracking-widest text-olive cursor-pointer hover:bg-surface transition flex items-center gap-8 bg-white">
-                <span>Default Sorting</span>
-                <i class="fas fa-chevron-down text-[10px]"></i>
-            </div>
-
+            <a href="{{ route('customer.products.index') }}" class="text-xs font-bold uppercase tracking-widest text-olive hover:text-coral transition flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Kembali ke Semua Produk
+            </a>
             <div class="text-taupe text-sm italic font-body">
                 Showing 1–{{ $products->count() }} of {{ $products->total() }} results
             </div>
@@ -52,7 +59,7 @@
             <div class="text-center py-20 border-2 border-dashed border-sand/30 rounded-lg">
                 <i class="fas fa-search text-sand text-4xl mb-4 opacity-50"></i>
                 <p class="text-olive font-heading text-lg italic">Maaf, belum ada produk di kategori ini.</p>
-                <a href="{{ route('customer.products.index') }}" class="text-coral text-sm font-bold uppercase mt-4 inline-block hover:underline">Kembali ke Shop</a>
+                <a href="{{ route('customer.products.index') }}" class="text-coral text-sm font-bold uppercase mt-4 inline-block hover:underline">Lihat Semua Produk</a>
             </div>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-12 gap-x-8">
@@ -62,9 +69,7 @@
                             @if($product->image)
                                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                             @else
-                                <div class="w-full h-full flex items-center justify-center bg-sand/10 text-sand">
-                                    <i class="fas fa-image fa-2x opacity-50"></i>
-                                </div>
+                                <div class="w-full h-full flex items-center justify-center bg-sand/10 text-sand"><i class="fas fa-image fa-2x opacity-50"></i></div>
                             @endif
 
                             @if($product->stock < 5)
@@ -77,7 +82,6 @@
                                 </a>
                             </div>
                         </div>
-
                         <div class="text-center">
                             <h3 class="font-heading text-lg text-olive mb-1 group-hover:text-coral transition cursor-pointer">
                                 <a href="{{ route('customer.products.show', $product) }}">{{ $product->name }}</a>
@@ -89,7 +93,6 @@
                     </div>
                 @endforeach
             </div>
-
             <div class="mt-20 flex justify-center">
                 {{ $products->appends(['category' => request('category')])->links() }}
             </div>
@@ -99,7 +102,7 @@
 @else
 
     {{-- ================================================================= --}}
-    {{-- TAMPILAN UTAMA SHOP (JIKA BELUM PILIH KATEGORI)                   --}}
+    {{-- 2. TAMPILAN UTAMA SHOP (GRID KATEGORI + SEMUA PRODUK)             --}}
     {{-- ================================================================= --}}
 
     <div class="bg-cream min-h-screen pb-20">
@@ -112,26 +115,41 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 border-b border-sand/20 pb-16">
-                <a href="{{ route('customer.products.index', ['category' => 'flowers']) }}" class="group block text-center cursor-pointer">
-                    <div class="relative overflow-hidden aspect-[3/4] bg-surface mb-6">
-                        <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Flowers" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 ease-in-out grayscale-[20%] group-hover:grayscale-0">
-                    </div>
-                    <h3 class="font-heading text-xl text-olive uppercase tracking-[0.2em] group-hover:text-coral transition">Flowers</h3>
-                </a>
-                <a href="{{ route('customer.products.index', ['category' => 'leaf']) }}" class="group block text-center cursor-pointer">
-                    <div class="relative overflow-hidden aspect-[3/4] bg-surface mb-6">
-                        <img src="https://images.unsplash.com/photo-1470058869958-2a77ade41c02?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Leaf" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 ease-in-out grayscale-[20%] group-hover:grayscale-0">
-                    </div>
-                    <h3 class="font-heading text-xl text-olive uppercase tracking-[0.2em] group-hover:text-coral transition">Leaf</h3>
-                </a>
-                <a href="{{ route('customer.products.index', ['category' => 'other']) }}" class="group block text-center cursor-pointer">
-                    <div class="relative overflow-hidden aspect-[3/4] bg-surface mb-6">
-                        <img src="https://images.unsplash.com/photo-1606822363068-154cb438e886?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Other" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 ease-in-out grayscale-[20%] group-hover:grayscale-0">
-                    </div>
-                    <h3 class="font-heading text-xl text-olive uppercase tracking-[0.2em] group-hover:text-coral transition">Other</h3>
-                </a>
-            </div>
+            @if(isset($categories) && count($categories) > 0)
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 border-b border-sand/20 pb-16">
+                    @foreach($categories as $category)
+                        <a href="{{ route('customer.products.index', ['category' => $category->slug]) }}" class="group block text-center cursor-pointer">
+                            <div class="relative overflow-hidden aspect-[3/4] bg-surface mb-6">
+                                
+                                {{-- LOGIKA GAMBAR KATEGORI --}}
+                                @if($category->image)
+                                    <img src="{{ asset('storage/' . $category->image) }}" 
+                                         alt="{{ $category->name }}" 
+                                         class="w-full h-full object-cover group-hover:scale-105 transition duration-700 ease-in-out grayscale-[20%] group-hover:grayscale-0">
+                                @else
+                                    @php
+                                        $imgUrl = 'https://images.unsplash.com/photo-1606822363068-154cb438e886?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
+                                        
+                                        if(stripos($category->slug, 'flower') !== false || stripos($category->slug, 'bunga') !== false) {
+                                            $imgUrl = 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
+                                        } elseif(stripos($category->slug, 'leaf') !== false || stripos($category->slug, 'daun') !== false) {
+                                            $imgUrl = 'https://images.unsplash.com/photo-1470058869958-2a77ade41c02?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
+                                        }
+                                    @endphp
+
+                                    <img src="{{ $imgUrl }}" 
+                                         alt="{{ $category->name }}" 
+                                         class="w-full h-full object-cover group-hover:scale-105 transition duration-700 ease-in-out grayscale-[20%] group-hover:grayscale-0">
+                                @endif
+
+                            </div>
+                            <h3 class="font-heading text-xl text-olive uppercase tracking-[0.2em] group-hover:text-coral transition">
+                                {{ $category->name }}
+                            </h3>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
 
             <div class="mb-12">
                 <span class="text-coral font-bold tracking-[0.2em] uppercase text-xs mb-2 block">Katalog</span>
